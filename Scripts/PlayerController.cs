@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.IO;
 
 public class PlayerController : MonoBehaviour {
 
@@ -10,7 +11,7 @@ public class PlayerController : MonoBehaviour {
     public float ammototal;
     public Weapon currentweapon;
     public float playerspeed;
-    public List<String> weaponlist;
+    public Dictionary<string,Weapon> weaponlist;
     public Weapon steriodenhanced;
     public float maxhealth;
     private Rigidbody2D rb;
@@ -18,59 +19,87 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        weaponlistbuilder();
-        currentweapon = Punch;
+        weaponlistcreate();
+        weaponlist.TryGetValue("Punch", out currentweapon);
+		AnimationControllerScript.weaponselect(currentweapon);
         maxhealth = 500;
         health = maxhealth;
         ammototal = 150;
         playerspeed = 5f;
 	}
 
-    public weaponlistbuilder()
+    public Dictionary<String,Weapon> weaponlistcreate()
     {
-        
+        weaponlist = new Dictionary<string,Weapon>();
+        using (StreamReader reader = new StreamReader("Assets/files/weapon.txt"))
+            while (!reader.EndOfStream)
+            {
+                string currentline = reader.ReadLine();
+                string[] pts = currentline.Split(':');
+                Weapon newweap = new Weapon(float.Parse(pts[0]), float.Parse(pts[1]), float.Parse(pts[2]), float.Parse(pts[3]), pts[4], bool.Parse(pts[5]));
+                weaponlist.Add(pts[4],newweap);
+            }
+        return weaponlist;
     }
 //unfinished reads in the list of weapons from the txt file and returns a list with all weapons and then creates a weapon foreach;
     
         
     void Update () {
-                if (Input.GetKey(KeyCode.UpArrow))
+		if (Input.GetKey(KeyCode.W))
         {
             transform.localScale = new Vector3(1, 1, 1);
             rb.velocity = new Vector2(rb.velocity.x,playerspeed);
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+		if (Input.GetKey(KeyCode.S))
         {
             transform.localScale = new Vector3(-1, 1, 1);
             rb.velocity = new Vector2(rb.velocity.x, playerspeed);
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+			if (Input.GetKey(KeyCode.D))
         {
             transform.localScale = new Vector3(1, 1, 1);
             rb.velocity = new Vector2(playerspeed, rb.velocity.y);
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+			if (Input.GetKey(KeyCode.A))
         {
             transform.localScale = new Vector3(-1, 1, 1);
             rb.velocity = new Vector2(-playerspeed, rb.velocity.y);
         }
+            if(Input.GetKey(KeyCode.R))
+        {
+            reload();
+        }
+            if(currentweapon.Ammo == 0)
+        {
+            reload();
+        }
     }
     //only has movement at this point
 
-    public void newweapon(string newWeaponName)
+    private void reload()
     {
-        if (currentweapon.Name == Punch)
+        AnimationControllerScript.Reload();
+        Weapon tempholder;
+        weaponlist.TryGetValue(currentweapon.Name, out tempholder);
+        float dif = (tempholder.Ammo - currentweapon.Ammo);
+        currentweapon.Ammo = tempholder.Ammo;
+        ammototal -= dif;
+        //Ui needs to change
+    }
+           public void newweapon(string newWeaponName)
+    {
+        if (currentweapon.Name == "Punch")
         {
-            currentweapon = ;
-                //needs to prompt a anim change
+            weaponlist.TryGetValue(newWeaponName, out currentweapon);
+			AnimationControllerScript.Weaponselect(currentweapon);
             }
         else
         {
             //ui message saying e to pick up
-            if (//e is pressed)
+			if (Input.GetKey(KeyCode.F))
                     {
-                currentweapon = ;
-                //anim changes;
+                weaponlist.TryGetValue(newWeaponName, out currentweapon);
+                AnimationControllerScript.Weaponselect(currentweapon);
             }
         }
     }
@@ -89,7 +118,7 @@ public class PlayerController : MonoBehaviour {
             ammoincrease();
             Destroy(ctrig.gameObject);
         }
-        if (weaponlist.Contains(ctrig.tag))
+        if (weaponlist.ContainsKey(ctrig.tag))
         {
             string newweaponname = ctrig.tag;
             newweapon(newweaponname);
