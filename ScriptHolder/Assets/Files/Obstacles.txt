@@ -1,0 +1,9 @@
+Stump
+Wall
+Crate
+Barrel
+Car
+Bush
+Log
+Rock
+LevelWall

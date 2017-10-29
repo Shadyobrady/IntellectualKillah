@@ -1,0 +1,8 @@
+Shotgun/150/16/30/False/.4
+Pistol/75/40/50/False/.2
+Ar/50/80/80/False/.08
+SniperRifle/200/8/100/False/.8
+Punch/30/1/5/True/1
+Bat/40/1/5/True/1
+Sword/60/1/5/True/1
+FryingPan/40/1/5/True/1
