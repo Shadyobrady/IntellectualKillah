@@ -10,32 +10,27 @@ public class ScoreManager : MonoBehaviour
     Text text;
     GameObject[] Aitotal;
 
-    void Awake ()
+    void Awake()
     {
-        text = GetComponent <Text> ();
+        text = GetComponent<Text>();
         Aitotal = GameObject.FindGameObjectsWithTag("AI");
         score = Aitotal.Length;
     }
-    
-    void Update ()
+
+    void Update()
     {
         Aitotal = GameObject.FindGameObjectsWithTag("AI");
         score = Aitotal.Length;
         text.text = "Enemies Left:" + score;
-        if(score == 1)
+        if (score == 1)
         {
             //Change Navmesh location to player
             text.text = "One Enemy Remaining";
         }
         if (score == 0)
         {
-            Winner();
+            text.text = "Level Cleared";
         }
     }
-
-    private void Winner()
-    {
-        text.text = "Level Cleared";
-        SceneManager.LoadSceneAsync("DeathScene");
-    }
 }
+    

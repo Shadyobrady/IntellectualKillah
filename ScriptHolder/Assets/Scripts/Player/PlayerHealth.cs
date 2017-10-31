@@ -49,7 +49,7 @@ public class PlayerHealth : MonoBehaviour
     {
         damaged = true;
 
-        currentHealth -= amount;
+        currentHealth = currentHealth - amount;
 
         healthSlider.value = currentHealth;
 
@@ -74,7 +74,7 @@ public class PlayerHealth : MonoBehaviour
         playerAudio.Play ();
 
         playerMovement.enabled = false;
-        //playerShooting.enabled = false;
+        playerShooting.enabled = false;
     }
 
 
