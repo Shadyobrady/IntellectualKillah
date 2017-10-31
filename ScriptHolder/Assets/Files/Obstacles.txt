@@ -7,3 +7,9 @@ Bush
 Log
 Rock
 LevelWall
+Container
+Oasis
+Market
+FencePost
+FencePane
+PyramidWall
