@@ -33,8 +33,9 @@ public class InGameObjectManager : MonoBehaviour
         System.Random rand = new System.Random();
         objdic = objectSorter();
         GameObject spawnObject;
-        objdic.TryGetValue(rand.Next(objdic.Count), out spawnObject);
-        for (int i = 0; i < 15; i++)
+        int next = rand.Next(objdic.Count);
+        objdic.TryGetValue(next, out spawnObject);
+        for (int i = 0; i < 5; i++)
         {
             int spawnPointIndex = rand.Next(ObjectspawnPoints.Length);
             Instantiate(spawnObject, ObjectspawnPoints[spawnPointIndex].transform.position,

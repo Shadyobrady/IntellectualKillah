@@ -85,14 +85,15 @@
     <Compile Include="Assets\Scripts\Enemy\EnemyMovement.cs" />
     <Compile Include="Assets\Scripts\Enemy\Vision.cs" />
     <Compile Include="Assets\Scripts\Managers\AnimationControllerScript.cs" />
-    <Compile Include="Assets\Scripts\Managers\DeathMenuManager.cs" />
     <Compile Include="Assets\Scripts\Managers\EnemyManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\FreePlayDeathMenuManager.cs" />
     <Compile Include="Assets\Scripts\Managers\FreePlayMenuManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameOverManager.cs" />
     <Compile Include="Assets\Scripts\Managers\InGameObjectManager.cs" />
     <Compile Include="Assets\Scripts\Managers\LevelManager.cs" />
     <Compile Include="Assets\Scripts\Managers\MainMenuManager.cs" />
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\StoryDeathManager.cs" />
     <Compile Include="Assets\Scripts\Managers\Weapon.cs" />
     <Compile Include="Assets\Scripts\Managers\WeaponSpawnManager.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerHealth.cs" />

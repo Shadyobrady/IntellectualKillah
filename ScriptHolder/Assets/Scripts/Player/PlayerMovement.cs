@@ -83,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
         if (ctrig.tag == "Health")
         {
             health.healthincrease();
-            Destroy(ctrig.gameObject);
+            DestroyObject(ctrig);
         }
         if (obstackeList.Contains(ctrig.tag)) ;
         {
@@ -92,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
         if (ctrig.tag == "Ammo")
         {
             shoot.ammoincrease();
-            Destroy(ctrig.gameObject);
+            DestroyObject(ctrig);
         }
         if (WeapDic.ContainsKey(ctrig.tag))
         {
@@ -105,6 +105,7 @@ public class PlayerMovement : MonoBehaviour
             onstreiods();
             Invoke("cooldown", 30);
             Invoke("returntonormal", 45);
+            DestroyObject(ctrig);
         }
     }
 

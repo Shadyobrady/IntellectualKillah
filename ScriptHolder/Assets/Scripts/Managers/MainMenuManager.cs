@@ -14,7 +14,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void FreePlay()
     {
-        SceneManager.LoadSceneAsync("FreePlay");
+        SceneManager.LoadSceneAsync("FreePlayMenu");
     }
 
     public void QuitGame()

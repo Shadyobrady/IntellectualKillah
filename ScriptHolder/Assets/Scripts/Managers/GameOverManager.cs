@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameOverManager : MonoBehaviour
 {
@@ -38,6 +39,6 @@ public class GameOverManager : MonoBehaviour
 
     void PlayerVictory()
     {
-        
+        SceneManager.LoadSceneAsync("VictoryScene");
     }
 }

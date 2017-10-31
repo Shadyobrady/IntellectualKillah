@@ -3,6 +3,7 @@
 public class EnemyManager : MonoBehaviour
 {
     public GameObject enemy;
+    public GameObject enemy1;
     GameObject[] spawnPoints;
 
 
@@ -18,8 +19,16 @@ public class EnemyManager : MonoBehaviour
         System.Random rand = new System.Random();
         for (int i = 0; i <10;i++)
         {
-            int spawnPointIndex = rand.Next(spawnPoints.Length);
+            if(i <= 5)
+            {
+                int spawnPointIndex = rand.Next(spawnPoints.Length);
+                Instantiate(enemy1, spawnPoints[spawnPointIndex].transform.position, spawnPoints[spawnPointIndex].transform.rotation);
+            }
+            else
+            {
+                int spawnPointIndex = rand.Next(spawnPoints.Length);
             Instantiate (enemy, spawnPoints[spawnPointIndex].transform.position, spawnPoints[spawnPointIndex].transform.rotation);
+            }
         }
         
     }
