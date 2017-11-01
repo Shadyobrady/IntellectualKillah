@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,19 +17,18 @@ public class WeaponSpawnManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        WeaponObj.Add(Shotgun);
-        WeaponObj.Add(Ar);
-        WeaponObj.Add(SniperRifle);
-        WeaponObj.Add(Knife);
-        WeaponObj.Add(Pistol);
-        WeaponObj.Add(FryingPan);
+        
         WeaponSpawn = GameObject.FindGameObjectsWithTag("WeaponSpawns");
+        WeaponObj = CreateWeaponList();
         Spawn();
 
+ 
     }
+
 
     void Spawn()
     {
+        
         System.Random rand = new System.Random();
         for (int i = 0; i < 5; i++)
         {
@@ -36,5 +36,17 @@ public class WeaponSpawnManager : MonoBehaviour
             Instantiate(WeaponObj[rand.Next(WeaponObj.Count)], WeaponSpawn[spawnPointIndex].transform.position, WeaponSpawn[spawnPointIndex].transform.rotation);
         }
 
+    }
+
+    private List<GameObject> CreateWeaponList()
+    {   
+        List<GameObject> weaplist = new List<GameObject>();
+        weaplist.Add(Shotgun);
+        weaplist.Add(Ar);
+        weaplist.Add(SniperRifle);
+        weaplist.Add(Knife);
+        weaplist.Add(Pistol);
+        weaplist.Add(FryingPan);
+        return weaplist;
     }
 }

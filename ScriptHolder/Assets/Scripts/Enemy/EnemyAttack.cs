@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Linq;
+using NUnit.Framework.Api;
 
 public class EnemyAttack : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class EnemyAttack : MonoBehaviour
     List<string> obstaList = new List<string>();
     public List<GameObject> targetsInSight = new List<GameObject>();
     public GameObject closestTarget = null;
+    GameObject attackTarget;
 
     void Awake ()
     {
@@ -105,15 +107,36 @@ public class EnemyAttack : MonoBehaviour
                    
                     Debug.DrawLine(transform.position, target.position, Color.green);
                     GameObject targetGameObject = target.gameObject;
-                    if(targetGameObject.tag == "Player")
-                    {targetsInSight.Add(targetGameObject); }
+                    if (targetGameObject.tag == "Player")
+                    {
+                        targetsInSight.Add(targetGameObject); 
+                        Debug.Log("Player Located for targets List");
+                    }
                     if (targetGameObject.tag == "AI")
-                    { targetsInSight.Add(targetGameObject); }
+                    {
+                        targetsInSight.Add(targetGameObject);
+                        Debug.Log("Ai Located for targets List");
+                    }
 
                 }
             }
         }
-        GameObject attackTarget = targetsInSight.First();
+        for(int i = 1; i>= targetsInSight.Count; i++)
+        {
+            GameObject a = targetsInSight[i];
+            float distance = Vector3.Distance(transform.position, a.transform.position);
+            if (i == 1)
+            {
+                attackTarget = a;
+            }
+            if (distance < Vector3.Distance(transform.position, attackTarget.transform.position))
+            {
+                attackTarget = a;
+            }
+
+        }
+        
+        Debug.Log("Ai has set " + attackTarget.tag + "as target");
         Attack(attackTarget);
         
 
@@ -140,7 +163,7 @@ public class EnemyAttack : MonoBehaviour
         if (targetGameObject.tag == "Player")
         {
             System.Random attackvariable = new System.Random();
-            int hitchance = attackvariable.Next(1, 100);
+            int hitchance = attackvariable.Next(100);
             if (Physics.Raycast(shootRay, out shootHit, CurrentWeapon.Range, shootableMask))
             {
                 if (hitchance<60)
@@ -161,8 +184,9 @@ public class EnemyAttack : MonoBehaviour
     {
         timer += Time.deltaTime;
 
-        if(timer >= timeBetweenAttacks && TargetInRange && enemyHealth.currentHealth > 0)
+        if(timer >= timeBetweenAttacks && enemyHealth.currentHealth > 0)
         {
+            Debug.Log("begining scan Range");
             ScanRange();
         }
 
