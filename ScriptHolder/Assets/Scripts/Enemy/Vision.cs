@@ -25,7 +25,7 @@ public class Vision : MonoBehaviour {
     void Awake()
     {
         attakcscript = GetComponent<EnemyAttack>();
-        currentWeapon = attakcscript.currentweapon;
+        currentWeapon = attakcscript.CurrentWeapon;
         sightRange = currentWeapon.Range;
         
     }
@@ -33,7 +33,6 @@ public class Vision : MonoBehaviour {
     {
         FindTargets();
         Debug.DrawRay(transform.position, transform.forward * sightRange);
-        closestTarget = targetsInSight.First();
     }
 
     void FindTargets()

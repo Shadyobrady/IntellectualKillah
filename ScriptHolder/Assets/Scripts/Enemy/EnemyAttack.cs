@@ -4,11 +4,12 @@ using Assets.Scripts;
 using System.Collections.Generic;
 using System;
 using System.IO;
+using System.Linq;
 
 public class EnemyAttack : MonoBehaviour
 {
     public float timeBetweenAttacks = 0.5f;
-    public Weapon currentweapon;
+    public Weapon CurrentWeapon;
     Animator anim;
     GameObject player;
     PlayerHealth playerHealth;
@@ -17,20 +18,31 @@ public class EnemyAttack : MonoBehaviour
     bool TargetInRange;
     float timer;
     Dictionary<string, Weapon> WeaponDic;
-    Vision visionScript;
+    Ray shootRay;
+    RaycastHit shootHit;
+    int wallMask;
+    int shootableMask;
+    LineRenderer gunLine;
+    public float sightRange;
+    [Range(0, 360)]
+    public float sightAngle;
+    List<string> obstaList = new List<string>();
+    public List<GameObject> targetsInSight = new List<GameObject>();
+    public GameObject closestTarget = null;
 
     void Awake ()
     {
         WeaponDic = createWeapDic();
         string weaponname ="";
         weaponname = randomWeapon(weaponname);
-        WeaponDic.TryGetValue(weaponname, out currentweapon);
+        WeaponDic.TryGetValue(weaponname, out CurrentWeapon);
         player = GameObject.FindWithTag("Player");
         shoot = player.GetComponent<PlayerShooting>();
         playerHealth = player.GetComponent <PlayerHealth> ();
         enemyHealth = GetComponent<EnemyHealth>();
         anim = GetComponent <Animator> ();
-        visionScript = GetComponent<Vision>();
+        shootableMask = LayerMask.GetMask("Shootable");
+        wallMask = LayerMask.GetMask("Wall");
     }
 
     private Dictionary<string, Weapon> createWeapDic()
@@ -79,34 +91,71 @@ public class EnemyAttack : MonoBehaviour
 
     void ScanRange()
     {
-        GameObject target = visionScript.closestTarget;
-        if(target.CompareTag("Player"))
+        targetsInSight.Clear();
+        Collider[] targetsInRange = Physics.OverlapSphere(transform.position, sightRange, shootableMask);
+        for (int i = 0; i < targetsInRange.Length; i++)
         {
-            TargetInRange = true;
-            timer = 0f;
-            if (playerHealth.currentHealth > 0)
+            Transform target = targetsInRange[i].transform;
+            Vector3 directionToTarget = (target.position - transform.position).normalized;
+            if (Vector3.Angle(transform.forward, directionToTarget) < sightAngle / 2)
             {
-                float damagetotal = currentweapon.Damage;
-                playerHealth.TakeDamage(damagetotal);
+                float distanceToTarget = Vector3.Distance(transform.position, target.position);
+                if (Physics.Raycast(transform.position,directionToTarget, distanceToTarget,wallMask))
+                {
+                   
+                    Debug.DrawLine(transform.position, target.position, Color.green);
+                    GameObject targetGameObject = target.gameObject;
+                    if(targetGameObject.tag == "Player")
+                    {targetsInSight.Add(targetGameObject); }
+                    if (targetGameObject.tag == "AI")
+                    { targetsInSight.Add(targetGameObject); }
+
+                }
             }
         }
-        if (target.CompareTag("AI"))
-        {
-            TargetInRange = true;
-            EnemyHealth targetHealth = target.GetComponent<EnemyHealth>();
-            timer = 0f;
-            if (targetHealth.currentHealth > 0)
-            {
-                float damagetotal = currentweapon.Damage;
-                targetHealth.TakeDamage(damagetotal);
-            }
-        }
+        GameObject attackTarget = targetsInSight.First();
+        Attack(attackTarget);
+        
 
     }
 
+    void Attack(GameObject targetGameObject)
+    {
+        if (targetGameObject.tag == "Ai")
+        {
+            System.Random attackvariable = new System.Random();
+            int hitchance = attackvariable.Next(1, 100);
+            if (Physics.Raycast(shootRay, out shootHit, CurrentWeapon.Range, shootableMask))
+                {
+                if (hitchance < 50)
+                {
+                    if (playerHealth != null)
+                    {
+                        playerHealth.TakeDamage((int)CurrentWeapon.Damage);
+                    }
+                    gunLine.SetPosition(1, shootHit.point);
+                }
+            }
+        }
+        if (targetGameObject.tag == "Player")
+        {
+            System.Random attackvariable = new System.Random();
+            int hitchance = attackvariable.Next(1, 100);
+            if (Physics.Raycast(shootRay, out shootHit, CurrentWeapon.Range, shootableMask))
+            {
+                if (hitchance<60)
+                {
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage((int) CurrentWeapon.Damage);
+                }
+                gunLine.SetPosition(1, shootHit.point);
+            } }
+            
+        }
+    }
 
-
-
+    
 
     void Update ()
     {

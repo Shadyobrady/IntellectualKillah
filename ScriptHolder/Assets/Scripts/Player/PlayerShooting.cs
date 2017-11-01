@@ -12,6 +12,8 @@ public class PlayerShooting : MonoBehaviour
     Ray shootRay;
     RaycastHit shootHit;
     int shootableMask;
+    int wallMask;
+
     //ParticleSystem gunParticles;
     LineRenderer gunLine;
     //AudioSource gunAudio;
@@ -50,6 +52,7 @@ public class PlayerShooting : MonoBehaviour
     {
         WeapDic.TryGetValue("Shotgun", out currentWeapon);
         shootableMask = LayerMask.GetMask ("Shootable");
+        wallMask = LayerMask.GetMask("Wall");
         //gunParticles = GetComponent<ParticleSystem> ();
         gunLine = GetComponent <LineRenderer> ();
         //gunAudio = GetComponent<AudioSource> ();
@@ -123,16 +126,20 @@ public class PlayerShooting : MonoBehaviour
                     currentWeapon.Mag -= 1;
                     ammotext.text = "Ammo:" + currentWeapon.Mag + "/" + ammototal;
                 }
-                if (Physics.Raycast(shootRay, out shootHit, currentWeapon.Range, shootableMask))
-                    {
-                        EnemyHealth enemyHealth = shootHit.collider.GetComponent<EnemyHealth>();
+                if(Physics.Raycast(shootRay, out shootHit, currentWeapon.Range, shootableMask))
+                {
+                    EnemyHealth enemyHealth = shootHit.collider.GetComponent<EnemyHealth>();
                         if (enemyHealth != null)
                         {
                             enemyHealth.TakeDamage((int) currentWeapon.Damage, shootHit.point);
                         }
                         gunLine.SetPosition(1, shootHit.point);
-                    }
-                    else
+                }
+                if (Physics.Raycast(shootRay, out shootHit, currentWeapon.Range, wallMask))
+                {
+                    gunLine.SetPosition(1, shootHit.point);
+                }
+        else
                     {
                         gunLine.SetPosition(1, shootRay.origin + shootRay.direction * currentWeapon.Range);
                     }
@@ -144,21 +151,12 @@ public class PlayerShooting : MonoBehaviour
 
     public void NewWeapon(string newWeaponName)
     {
-        if (currentWeapon.Name == "Punch")
-        {
-            WeapDic.TryGetValue(newWeaponName, out currentWeapon);
-            //AnimationControllerScript.Weaponselect(currentweapon);
-        }
-        else
-        {
-            flashuptext.text = "Enter F to pick up" + currentWeapon.Name;
-            Invoke("resetflashup", 2);
-            if (Input.GetKey(KeyCode.F))
-            {
-                WeapDic.TryGetValue(newWeaponName, out currentWeapon);
-                //AnimationControllerScript.Weaponselect(currentweapon);
-            }
-        }
+        
+        WeapDic.TryGetValue(newWeaponName, out currentWeapon);
+        flashuptext.text = newWeaponName + " equipped";
+        Invoke("Resetflashputext",5);
+        //AnimationControllerScript.Weaponselect(currentweapon);
+
     }
     //assigns new weapon and changes the anim used
 
@@ -171,11 +169,13 @@ public class PlayerShooting : MonoBehaviour
   
     public void ammoincrease()
     {
-
+        Debug.Log("Ammo increase begun");
         System.Random ammoRand = new System.Random();
-        int ammoIncreaseAmount = ammoRand.Next(1, 30);
-        ammototal += ammoIncreaseAmount;
+        int ammoIncreaseAmount = ammoRand.Next(30);
+        ammototal = ammototal + ammoIncreaseAmount;
         ammotext.text = "Ammo:" + currentWeapon.Mag + "/" + ammototal;
+        flashuptext.text = "+" + ammoIncreaseAmount + " Ammo";
+        Debug.Log("Ammo increase finished");
     }
     //this method increase the ammo total by a random amount between 1 and 30
  

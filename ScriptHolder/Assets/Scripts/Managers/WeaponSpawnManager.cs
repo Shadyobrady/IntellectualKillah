@@ -8,8 +8,7 @@ public class WeaponSpawnManager : MonoBehaviour
     public GameObject Shotgun;
     public GameObject Ar;
     public GameObject SniperRifle;
-    public GameObject Sword;
-    public GameObject Bat;
+    public GameObject Knife;
     public GameObject Pistol;
     public GameObject FryingPan;
     private GameObject[] WeaponSpawn;
@@ -20,8 +19,7 @@ public class WeaponSpawnManager : MonoBehaviour
         WeaponObj.Add(Shotgun);
         WeaponObj.Add(Ar);
         WeaponObj.Add(SniperRifle);
-        WeaponObj.Add(Sword);
-        WeaponObj.Add(Bat);
+        WeaponObj.Add(Knife);
         WeaponObj.Add(Pistol);
         WeaponObj.Add(FryingPan);
         WeaponSpawn = GameObject.FindGameObjectsWithTag("WeaponSpawns");

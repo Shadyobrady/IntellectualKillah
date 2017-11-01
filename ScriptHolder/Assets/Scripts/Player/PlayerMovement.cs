@@ -6,13 +6,12 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
 
-    public float speed = 5f;
+    public float speed;
     Vector3 movement;
     Animator Anim;
     Rigidbody rb;
     int floorMask;
     float camRayLength = 100f;
-    Collider pointcontactzone;
     Dictionary<string, Weapon> WeapDic = createWeapdic();
     PlayerShooting shoot;
     PlayerHealth health;
@@ -23,10 +22,9 @@ public class PlayerMovement : MonoBehaviour
         floorMask = LayerMask.GetMask("Ground");
         Anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-        pointcontactzone = GetComponent<Collider>();
-        shoot = GetComponent<PlayerShooting>();
+        shoot = GetComponentInChildren<PlayerShooting>();
         health = GetComponent<PlayerHealth>();
-
+        speed = 30;
     }
 
     private static List<string> obsList()
@@ -76,36 +74,39 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    void OnTriggerEnter(Collider ctrig)
+    void OnCollisionEnter(Collision ctrig)
     {
         obstackeList = obsList();
-        ctrig = pointcontactzone;
-        if (ctrig.tag == "Health")
+        string objectTag = ctrig.gameObject.tag;
+        if (objectTag == "Health")
         {
+            Debug.Log(objectTag);
             health.healthincrease();
-            DestroyObject(ctrig);
+            DestroyObject(ctrig.gameObject);
         }
-        if (obstackeList.Contains(ctrig.tag)) ;
+        if (obstackeList.Contains(objectTag))
         {
+            Debug.Log(objectTag);
             movement = Vector3.zero;
         }
-        if (ctrig.tag == "Ammo")
+        if (objectTag == "Ammo")
         {
             shoot.ammoincrease();
-            DestroyObject(ctrig);
+            Debug.Log(objectTag + "picked up");
+            DestroyObject(ctrig.gameObject);
         }
-        if (WeapDic.ContainsKey(ctrig.tag))
+        if (WeapDic.ContainsKey(objectTag))
         {
-            string newweaponname = ctrig.tag;
-            shoot.NewWeapon(newweaponname);
+            Debug.Log(objectTag +" has been passed to the NewWeapon method in the playershooting script");
+            shoot.NewWeapon(objectTag);
+            DestroyObject(ctrig.gameObject);
 
         }
-        if (ctrig.tag == "Steriods")
+        if (objectTag == "Steriods")
         {
+            Debug.Log(objectTag);
             onstreiods();
-            Invoke("cooldown", 30);
-            Invoke("returntonormal", 45);
-            DestroyObject(ctrig);
+            DestroyObject(ctrig.gameObject);
         }
     }
 
@@ -138,14 +139,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void returntonormal()
     {
-        speed = 5f;
+        speed = 30;
 
     }
     //returns the players speed back to normal
     private void cooldown()
     {
-        speed = 3f;
+        speed = 10;
         shoot.Resetflashputext();
+        Invoke("returntonormal", 10);
     }
 
     //runs the cooldown after steriods reduces speed to 75% orginal, changes melee damage back to normal
@@ -155,8 +157,9 @@ public class PlayerMovement : MonoBehaviour
         {
             shoot.currentWeapon.Damage = shoot.currentWeapon.Damage * 2;
         }
-        speed = 8f;
+        speed = 100;
         shoot.flashuptext.text = "Steriods Acivated";
+        Invoke("cooldown", 10);
     }
 
 

@@ -26,7 +26,6 @@ public class PlayerHealth : MonoBehaviour
         //anim = GetComponent <Animator> ();
         playerAudio = GetComponent <AudioSource> ();
         playerMovement = GetComponent <PlayerMovement> ();
-        //playerShooting = GetComponentInChildren <PlayerShooting> ();
         currentHealth = startingHealth;
     }
 
@@ -94,7 +93,7 @@ public class PlayerHealth : MonoBehaviour
             increase = (startingHealth - preincrease) * -1;
             currentHealth = startingHealth;
         }
-        playerShooting.flashuptext.text = "+ 50 Health";
-        Invoke("playerShooting.resetflashputext", 2);
+        //playerShooting.flashuptext.text = "+ 50 Health";
+        //Invoke("playerShooting.resetflashputext", 2);
     }
 }
