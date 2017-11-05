@@ -29,6 +29,8 @@ public class EnemyAttack : MonoBehaviour
     public List<GameObject> targetsInSight = new List<GameObject>();
     public GameObject closestTarget = null;
     GameObject attackTarget;
+    private GameObject thisAi;
+    private Collider[] targetsInRange;
 
     void Awake ()
     {
@@ -42,6 +44,7 @@ public class EnemyAttack : MonoBehaviour
         enemyHealth = GetComponent<EnemyHealth>();
         shootableMask = LayerMask.GetMask("Shootable");
         wallMask = LayerMask.GetMask("Wall");
+        thisAi = gameObject;
     }
 
     private Dictionary<string, Weapon> createWeapDic()
@@ -91,31 +94,33 @@ public class EnemyAttack : MonoBehaviour
         
         targetsInSight.Clear();
         Debug.Log("TargetsinSight cleared");
-        Collider[] targetsInRange = Physics.OverlapSphere(transform.position, sightRange, shootableMask);
+        targetsInRange = Physics.OverlapSphere(transform.position, sightRange, shootableMask);
         Debug.Log("All Shootablemask objects added to collider array");
-        for (int i = 0; i < targetsInRange.Length; i++)
+        Debug.Log(targetsInRange.Length);
+        foreach (Collider i in targetsInRange)
         {
-            if (targetsInRange[i].gameObject == this.gameObject)
+            Debug.Log(i.gameObject.tag + " is currently going through Vision Check");
+            if (i.gameObject == gameObject)
             {
                 Debug.Log("Object identified as this object");
                 continue;
             }
-            Debug.Log(targetsInRange[i].tag + "check begun");
-            Transform target = targetsInRange[i].transform;
+            Debug.Log(i.tag + "check begun");
+            Transform target = i.transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
-            Debug.Log(targetsInRange[i].tag + "direction located");
+            Debug.Log(i.tag + "direction located");
             if (Vector3.Angle(transform.forward, directionToTarget) < sightAngle / 2)
             {
                 Debug.Log("Angle Check Completed");
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
                 Debug.Log("distance to target calculated");
-                if (Physics.Raycast(transform.position,directionToTarget, distanceToTarget,wallMask))
+                if (Physics.Raycast(transform.position, directionToTarget, distanceToTarget, wallMask))
                 {
-                   Debug.Log("Check for walls in the way completed");
+                    Debug.Log("Check for walls in the way completed");
                     GameObject targetGameObject = target.gameObject;
                     if (targetGameObject.tag == "Player")
                     {
-                        targetsInSight.Add(targetGameObject); 
+                        targetsInSight.Add(targetGameObject);
                         Debug.Log("Player Located for targets List");
                     }
                     if (targetGameObject.tag == "AI")
@@ -123,8 +128,11 @@ public class EnemyAttack : MonoBehaviour
                         targetsInSight.Add(targetGameObject);
                         Debug.Log("Ai Located for targets List");
                     }
-
                 }
+            }
+            else
+            {
+                continue;
             }
         }
         for(int i = 1; i>= targetsInSight.Count; i++)

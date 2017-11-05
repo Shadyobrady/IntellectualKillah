@@ -17,7 +17,7 @@ public class EnemyManager : MonoBehaviour
     void Spawn ()
     {
         System.Random rand = new System.Random();
-        for (int i = 0; i <1;i++)
+        for (int i = 0; i <10;i++)
         {
             if(i <= 5)
             {
