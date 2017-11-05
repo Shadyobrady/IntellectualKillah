@@ -13,7 +13,7 @@ public class PlayerShooting : MonoBehaviour
     RaycastHit shootHit;
     int shootableMask;
     int wallMask;
-
+    private PlayerAnimController controllerscript;
     //ParticleSystem gunParticles;
     LineRenderer gunLine;
     //AudioSource gunAudio;
@@ -50,7 +50,7 @@ public class PlayerShooting : MonoBehaviour
  
     void Awake ()
     {
-        WeapDic.TryGetValue("Shotgun", out currentWeapon);
+        WeapDic.TryGetValue("Punch", out currentWeapon);
         shootableMask = LayerMask.GetMask ("Shootable");
         wallMask = LayerMask.GetMask("Wall");
         //gunParticles = GetComponent<ParticleSystem> ();
@@ -58,6 +58,7 @@ public class PlayerShooting : MonoBehaviour
         //gunAudio = GetComponent<AudioSource> ();
         ammotext = GameObject.FindWithTag("ammotext").GetComponent<Text>();
         flashuptext = GameObject.FindWithTag("flashtxt").GetComponent<Text>();
+        controllerscript = GetComponentInChildren<PlayerAnimController>();
         Resetflashputext();
         ammototal = 100;
     }
@@ -69,10 +70,12 @@ public class PlayerShooting : MonoBehaviour
         if (Input.GetButton ("Fire1") && timer >= currentWeapon.FireRate && Time.timeScale != 0 && currentWeapon.Mag > 0 )
         {
             Shoot ();
+            controllerscript.Attack();
         }
         if(timer >= currentWeapon.FireRate * effectsDisplayTime)
         {
             DisableEffects ();
+            controllerscript.ResetAttack();
         }
         if (Input.GetKey(KeyCode.R))
         {
@@ -86,7 +89,7 @@ public class PlayerShooting : MonoBehaviour
 
     public void reload()
     {
-        //AnimationControllerScript.Reload();
+        controllerscript.ReloadAnim();
         if (ammototal == 0) return;
         float dif = currentWeapon.Ammo - currentWeapon.Mag;
         if (ammototal - dif < 0)
@@ -110,54 +113,52 @@ public class PlayerShooting : MonoBehaviour
     }
 
 
-    void Shoot ()
+    void Shoot()
     {
+        controllerscript.Attack();
         timer = 0f;
         //gunAudio.Play ();          
         //gunParticles.Stop ();
         //gunParticles.Play ();
         gunLine.enabled = true;
-        gunLine.SetPosition (0, transform.position);
+        gunLine.SetPosition(0, transform.position);
         shootRay.origin = transform.position;
         shootRay.direction = transform.forward;
-        
-                if (currentWeapon.Melee == false)
-                {
-                    currentWeapon.Mag -= 1;
-                    ammotext.text = "Ammo:" + currentWeapon.Mag + "/" + ammototal;
-                }
-                if(Physics.Raycast(shootRay, out shootHit, currentWeapon.Range, shootableMask))
-                {
-                    EnemyHealth enemyHealth = shootHit.collider.GetComponent<EnemyHealth>();
-                        if (enemyHealth != null)
-                        {
-                            enemyHealth.TakeDamage((int) currentWeapon.Damage, shootHit.point);
-                        }
-                        gunLine.SetPosition(1, shootHit.point);
-                }
-                if (Physics.Raycast(shootRay, out shootHit, currentWeapon.Range, wallMask))
-                {
-                    gunLine.SetPosition(1, shootHit.point);
-                }
-        else
-                    {
-                        gunLine.SetPosition(1, shootRay.origin + shootRay.direction * currentWeapon.Range);
-                    }
-                
+
+        if (currentWeapon.Melee == false)
+        {
+            currentWeapon.Mag -= 1;
+            ammotext.text = "Ammo:" + currentWeapon.Mag + "/" + ammototal;
+        }
+        if (Physics.Raycast(shootRay, out shootHit, currentWeapon.Range, shootableMask))
+        {
+            EnemyHealth enemyHealth = shootHit.collider.GetComponent<EnemyHealth>();
+            if (enemyHealth != null)
+            {
+                enemyHealth.TakeDamage((int) currentWeapon.Damage, shootHit.point);
+
             }
-    
-      
- 
+            gunLine.SetPosition(1, shootHit.point);
+        }
+        if (Physics.Raycast(shootRay, out shootHit, currentWeapon.Range, wallMask))
+        {
+            gunLine.SetPosition(1, shootHit.point);
+        }
+        else
+        {
+            gunLine.SetPosition(1, shootRay.origin + shootRay.direction * currentWeapon.Range);
+        }
+  }
 
     public void NewWeapon(string newWeaponName)
     {
-        
         WeapDic.TryGetValue(newWeaponName, out currentWeapon);
         flashuptext.text = newWeaponName + " equipped";
-        Invoke("Resetflashputext",5);
-        //AnimationControllerScript.Weaponselect(currentweapon);
-
-    }
+        Invoke("Resetflashputext",2);
+        Weapon newWeap;
+        WeapDic.TryGetValue(newWeaponName, out newWeap);
+        controllerscript.CheckWeapon(newWeap);
+     }
     //assigns new weapon and changes the anim used
 
 

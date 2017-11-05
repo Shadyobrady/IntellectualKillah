@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
 
     public float speed;
     Vector3 movement;
-    Animator Anim;
+    private PlayerAnimController Anim;
     Rigidbody rb;
     int floorMask;
     float camRayLength = 100f;
@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         floorMask = LayerMask.GetMask("Ground");
-        Anim = GetComponent<Animator>();
+        Anim = GetComponentInChildren<PlayerAnimController>();
         rb = GetComponent<Rigidbody>();
         shoot = GetComponentInChildren<PlayerShooting>();
         health = GetComponent<PlayerHealth>();
@@ -70,8 +70,7 @@ public class PlayerMovement : MonoBehaviour
         float Vert = Input.GetAxisRaw("Vertical");
         Move(Horz, Vert);
         Turning();
-        Animating(Horz, Vert);
-
+        Anim.Animating(Horz, Vert);
     }
 
     void OnCollisionEnter(Collision ctrig)
@@ -97,7 +96,6 @@ public class PlayerMovement : MonoBehaviour
         }
         if (WeapDic.ContainsKey(objectTag))
         {
-            Debug.Log(objectTag +" has been passed to the NewWeapon method in the playershooting script");
             shoot.NewWeapon(objectTag);
             DestroyObject(ctrig.gameObject);
 
@@ -130,12 +128,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Animating(float Horizon,float Vert)
-    {
-        bool walking = Horizon != 0f || Vert != 0f;
-        Anim.SetBool("isWalking", walking);
-
-   }
 
     private void returntonormal()
     {

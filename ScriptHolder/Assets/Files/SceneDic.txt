@@ -1,0 +1,9 @@
+StartingCutScene/StoryModeUnstarted
+TownLeevel/StoryModeStarted
+Level1Custscene/Level1Complete
+ContainerYardLevel/CutsceneComplete
+Level2Cutscene/Level2Complete
+DesertLevel/CutsceneComplete
+Level3CutScene/Level3Complete
+MountainVillage/CutsceneComplete
+MainMenu/StoryModeComplete

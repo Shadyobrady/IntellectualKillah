@@ -11,10 +11,9 @@ public class EnemyAttack : MonoBehaviour
 {
     public float timeBetweenAttacks = 0.5f;
     public Weapon CurrentWeapon;
-    Animator anim;
+    private EnemyAnimController EnemyAnimatorScript;
     GameObject player;
     PlayerHealth playerHealth;
-    PlayerShooting shoot;
     EnemyHealth enemyHealth;
     bool TargetInRange;
     float timer;
@@ -27,7 +26,6 @@ public class EnemyAttack : MonoBehaviour
     public float sightRange;
     [Range(0, 360)]
     public float sightAngle;
-    List<string> obstaList = new List<string>();
     public List<GameObject> targetsInSight = new List<GameObject>();
     public GameObject closestTarget = null;
     GameObject attackTarget;
@@ -38,11 +36,10 @@ public class EnemyAttack : MonoBehaviour
         string weaponname ="";
         weaponname = randomWeapon(weaponname);
         WeaponDic.TryGetValue(weaponname, out CurrentWeapon);
+        EnemyAnimatorScript = GetComponentInChildren<EnemyAnimController>();
         player = GameObject.FindWithTag("Player");
-        shoot = player.GetComponent<PlayerShooting>();
         playerHealth = player.GetComponent <PlayerHealth> ();
         enemyHealth = GetComponent<EnemyHealth>();
-        anim = GetComponent <Animator> ();
         shootableMask = LayerMask.GetMask("Shootable");
         wallMask = LayerMask.GetMask("Wall");
     }
@@ -64,7 +61,6 @@ public class EnemyAttack : MonoBehaviour
                 float fireRate = float.Parse(pts[5]);
                 Weapon ab = new Weapon(damage, ammo, range, weaponName, melee, fireRate);
                 newdic.Add(weaponName, ab);
-
             }
         }
         return newdic;
@@ -78,7 +74,6 @@ public class EnemyAttack : MonoBehaviour
         if(rando == 1)
         {
             weap = "Punch";
-
         }
         else if (rando == 2)
         {
@@ -93,19 +88,30 @@ public class EnemyAttack : MonoBehaviour
 
     void ScanRange()
     {
+        
         targetsInSight.Clear();
+        Debug.Log("TargetsinSight cleared");
         Collider[] targetsInRange = Physics.OverlapSphere(transform.position, sightRange, shootableMask);
+        Debug.Log("All Shootablemask objects added to collider array");
         for (int i = 0; i < targetsInRange.Length; i++)
         {
+            if (targetsInRange[i].gameObject == this.gameObject)
+            {
+                Debug.Log("Object identified as this object");
+                continue;
+            }
+            Debug.Log(targetsInRange[i].tag + "check begun");
             Transform target = targetsInRange[i].transform;
             Vector3 directionToTarget = (target.position - transform.position).normalized;
+            Debug.Log(targetsInRange[i].tag + "direction located");
             if (Vector3.Angle(transform.forward, directionToTarget) < sightAngle / 2)
             {
+                Debug.Log("Angle Check Completed");
                 float distanceToTarget = Vector3.Distance(transform.position, target.position);
+                Debug.Log("distance to target calculated");
                 if (Physics.Raycast(transform.position,directionToTarget, distanceToTarget,wallMask))
                 {
-                   
-                    Debug.DrawLine(transform.position, target.position, Color.green);
+                   Debug.Log("Check for walls in the way completed");
                     GameObject targetGameObject = target.gameObject;
                     if (targetGameObject.tag == "Player")
                     {
@@ -133,28 +139,27 @@ public class EnemyAttack : MonoBehaviour
             {
                 attackTarget = a;
             }
-
         }
-        
         Debug.Log("Ai has set " + attackTarget.tag + "as target");
         Attack(attackTarget);
-        
-
     }
 
     void Attack(GameObject targetGameObject)
     {
+        Debug.Log("Attack method called");
         if (targetGameObject.tag == "Ai")
         {
+            EnemyHealth targetHealth = targetGameObject.GetComponent<EnemyHealth>();
             System.Random attackvariable = new System.Random();
-            int hitchance = attackvariable.Next(1, 100);
+            int hitchance = attackvariable.Next(100);
+            Debug.Log("Hit Chance Calculated");
             if (Physics.Raycast(shootRay, out shootHit, CurrentWeapon.Range, shootableMask))
                 {
                 if (hitchance < 50)
                 {
-                    if (playerHealth != null)
+                    if (targetHealth != null)
                     {
-                        playerHealth.TakeDamage((int)CurrentWeapon.Damage);
+                        targetHealth.TakeDamage((int)CurrentWeapon.Damage);
                     }
                     gunLine.SetPosition(1, shootHit.point);
                 }
@@ -192,7 +197,7 @@ public class EnemyAttack : MonoBehaviour
 
         if(playerHealth.currentHealth <= 0)
         {
-            anim.SetTrigger("isDead");
+            EnemyAnimatorScript.isDead();
         }
     }
 

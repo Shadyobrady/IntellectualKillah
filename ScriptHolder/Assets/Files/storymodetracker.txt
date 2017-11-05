@@ -1,0 +1,12 @@
+StoryModeUnstarted
+StoryModeStarted
+Level1Complete
+CutsceneComplete
+Level2Complete
+CutsceneComplete
+Level3Complete
+CutsceneComplete
+StoryModeComplete
+
+GameMode Status
+LoggedIn,LoggedOut,Freeplay and StoryMode
